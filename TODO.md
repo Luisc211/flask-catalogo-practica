@@ -1,5 +1,4 @@
 ## Pendiente
-- [ ] Crear plantilla base (`base.html`) con herencia de plantillas
 - [ ] Página de detalle de producto (`detalle.html`)
 - [ ] Añadir CSS básico en `static/`
 - [ ] Guardar productos en SQLite
@@ -9,3 +8,4 @@
 - [x] Instalar Flask
 - [x] Crear ruta del catálogo
 - [x] Crear plantilla `catalogo.html`
+- [x] Crear plantilla base (`base.html`) con herencia de plantillas
