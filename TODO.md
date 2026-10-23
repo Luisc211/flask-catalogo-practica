@@ -1,4 +1,4 @@
-## Pendiente
+
 ## Pendiente
 - [ ] Formulario para agregar productos
 - [ ] Editar productos
