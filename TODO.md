@@ -1,4 +1,13 @@
 ## Pendiente
+## Pendiente
+- [ ] Formulario para agregar productos
+- [ ] Editar productos
+- [ ] Eliminar productos
+- [ ] Mensajes flash de confirmación
+- [ ] Validación de datos del formulario
+- [ ] Página de inicio con plantilla (`inicio.html`)
+- [ ] Página 404 personalizada
+- [ ] Subir proyecto a GitHub con README
 
 ## Hecho
 - [x] Crear entorno virtual
