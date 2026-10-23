@@ -1,12 +1,9 @@
 from flask import Flask, render_template, abort
+from database import get_connection, init_db
 
 app = Flask(__name__)
 
-PRODUCTOS = [
-    {"id": 1, "nombre": "Cuaderno", "precio": 5000},
-    {"id": 2, "nombre": "Lapicero", "precio": 1500},
-    {"id": 3, "nombre": "Borrador", "precio": 800},
-]
+init_db()
 
 @app.route("/")
 def inicio():
@@ -14,11 +11,19 @@ def inicio():
 
 @app.route("/catalogo")
 def catalogo():
-    return render_template("catalogo.html", productos=PRODUCTOS)
+    conn = get_connection()
+    productos = conn.execute("SELECT * FROM productos").fetchall()
+    conn.close()
+    return render_template("catalogo.html", productos=productos)
+
 
 @app.route("/producto/<int:producto_id>")
 def detalle(producto_id):
-    for producto in PRODUCTOS:
-        if producto["id"] == producto_id:
-            return render_template("detalle.html", producto=producto)
-    abort(404)
+    conn = get_connection()
+    producto = conn.execute(
+        "SELECT * FROM productos WHERE id = ?", (producto_id,)
+    ).fetchone()
+    conn.close()
+    if producto is None:
+        abort(404)
+    return render_template("detalle.html", producto=producto)
