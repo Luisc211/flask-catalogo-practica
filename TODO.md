@@ -1,6 +1,5 @@
 
 ## Pendiente
-- [ ] Editar productos
 - [ ] Eliminar productos
 - [ ] Mensajes flash de confirmación
 - [ ] Validación de datos del formulario
@@ -18,3 +17,4 @@
 - [x] Añadir CSS básico en `static/`
 - [x] Guardar productos en SQLite
 - [x] Formulario para agregar productos
+- [x] Editar productos
