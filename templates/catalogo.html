@@ -3,7 +3,12 @@ contenido %}
 <h1>Catálogo</h1>
 <ul>
   {% for producto in productos %}
-  <li>{{ producto.nombre }} - ${{ producto.precio }}</li>
+  <li>
+    <a href="{{ url_for('detalle', producto_id=producto.id) }}">
+      {{ producto.nombre }}
+    </a>
+    - ${{ producto.precio }}
+  </li>
   {% endfor %}
 </ul>
 {% endblock %}
