@@ -1,5 +1,4 @@
 ## Pendiente
-- [ ] Guardar productos en SQLite
 
 ## Hecho
 - [x] Crear entorno virtual
@@ -9,3 +8,4 @@
 - [x] Crear plantilla base (`base.html`) con herencia de plantillas
 - [x] Página de detalle de producto (`detalle.html`)
 - [x] Añadir CSS básico en `static/`
+- [x] Guardar productos en SQLite
