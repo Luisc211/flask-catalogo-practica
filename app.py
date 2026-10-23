@@ -1,13 +1,15 @@
-from flask import Flask, render_template, abort
+from flask import Flask, render_template, abort, request, redirect, url_for
 from database import get_connection, init_db
 
 app = Flask(__name__)
 
 init_db()
 
+
 @app.route("/")
 def inicio():
     return "¡Hola, Flask!"
+
 
 @app.route("/catalogo")
 def catalogo():
@@ -15,6 +17,25 @@ def catalogo():
     productos = conn.execute("SELECT * FROM productos").fetchall()
     conn.close()
     return render_template("catalogo.html", productos=productos)
+
+
+@app.route("/producto/nuevo", methods=["GET", "POST"])
+def nuevo_producto():
+    if request.method == "POST":
+        nombre = request.form["nombre"].strip()
+        precio = int(request.form["precio"])
+
+        conn = get_connection()
+        conn.execute(
+            "INSERT INTO productos (nombre, precio) VALUES (?, ?)",
+            (nombre, precio),
+        )
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("catalogo"))
+
+    return render_template("nuevo.html")
 
 
 @app.route("/producto/<int:producto_id>")
