@@ -1,6 +1,5 @@
 
 ## Pendiente
-- [ ] Formulario para agregar productos
 - [ ] Editar productos
 - [ ] Eliminar productos
 - [ ] Mensajes flash de confirmación
@@ -18,3 +17,4 @@
 - [x] Página de detalle de producto (`detalle.html`)
 - [x] Añadir CSS básico en `static/`
 - [x] Guardar productos en SQLite
+- [x] Formulario para agregar productos

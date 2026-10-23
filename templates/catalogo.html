@@ -1,6 +1,7 @@
 {% extends "base.html" %} {% block titulo %}Catálogo{% endblock %} {% block
 contenido %}
 <h1>Catálogo</h1>
+<a href="{{ url_for('nuevo_producto') }}">+ Agregar producto</a>
 <ul>
   {% for producto in productos %}
   <li>
