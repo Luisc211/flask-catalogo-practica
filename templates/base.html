@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block titulo %}Mi catálogo{% endblock %}</title>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="{{ url_for('inicio') }}">Inicio</a>
+        <a href="{{ url_for('catalogo') }}">Catálogo</a>
+      </nav>
+    </header>
+
+    <main>{% block contenido %}{% endblock %}</main>
+
+    <footer>
+      <p>Catálogo de práctica con Flask</p>
+    </footer>
+  </body>
+</html>
