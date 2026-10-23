@@ -1,6 +1,4 @@
 ## Pendiente
-- [ ] Página de detalle de producto (`detalle.html`)
-- [ ] Añadir CSS básico en `static/`
 - [ ] Guardar productos en SQLite
 
 ## Hecho
@@ -10,3 +8,4 @@
 - [x] Crear plantilla `catalogo.html`
 - [x] Crear plantilla base (`base.html`) con herencia de plantillas
 - [x] Página de detalle de producto (`detalle.html`)
+- [x] Añadir CSS básico en `static/`
