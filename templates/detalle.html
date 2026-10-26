@@ -7,5 +7,12 @@
     >Editar producto</a
   >
 </p>
+<form
+  method="POST"
+  action="{{ url_for('eliminar_producto', producto_id=producto.id) }}"
+  onsubmit="return confirm('¿Seguro que quieres eliminar este producto?');"
+>
+  <button type="submit" class="btn-danger">Eliminar producto</button>
+</form>
 <a href="{{ url_for('catalogo') }}">← Volver al catálogo</a>
 {% endblock %}
