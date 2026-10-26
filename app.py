@@ -46,6 +46,7 @@ def detalle(producto_id):
         abort(404)
     return render_template("detalle.html", producto=producto)
 
+
 @app.route("/producto/<int:producto_id>/editar", methods=["GET", "POST"])
 def editar_producto(producto_id):
     conn = get_connection()
@@ -67,3 +68,18 @@ def editar_producto(producto_id):
         return redirect(url_for("detalle", producto_id=producto_id))
     conn.close()
     return render_template("editar.html", producto=producto)
+
+
+@app.route("/producto/<int:producto_id>/eliminar", methods=["POST"])
+def eliminar_producto(producto_id):
+    conn = get_connection()
+    producto = conn.execute(
+        "SELECT id FROM productos WHERE id = ?", (producto_id,)
+    ).fetchone()
+    if producto is None:
+        conn.close()
+        abort(404)
+    conn.execute("DELETE FROM productos WHERE id = ?", (producto_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for("catalogo"))

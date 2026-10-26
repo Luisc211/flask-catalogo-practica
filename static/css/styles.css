@@ -5,6 +5,7 @@
   --surface: white;
   --text: #333;
   --text-muted: #777;
+  --danger: #c0392b;
 }
 
 * {
@@ -107,4 +108,8 @@ button {
 
 button:hover {
   opacity: 0.9;
+}
+
+.btn-danger {
+  background-color: var(--danger);
 }

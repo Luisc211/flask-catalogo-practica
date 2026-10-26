@@ -1,6 +1,5 @@
 
 ## Pendiente
-- [ ] Eliminar productos
 - [ ] Mensajes flash de confirmación
 - [ ] Validación de datos del formulario
 - [ ] Página de inicio con plantilla (`inicio.html`)
@@ -18,3 +17,4 @@
 - [x] Guardar productos en SQLite
 - [x] Formulario para agregar productos
 - [x] Editar productos
+- [x] Eliminar productos
