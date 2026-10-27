@@ -1,7 +1,9 @@
-from flask import Flask, render_template, abort, request, redirect, url_for
+from flask import Flask, render_template, abort, request, redirect, url_for, flash
 from database import get_connection, init_db
 
 app = Flask(__name__)
+
+app.secret_key = "key-secreta"
 
 init_db()
 
@@ -31,6 +33,7 @@ def nuevo_producto():
         )
         conn.commit()
         conn.close()
+        flash("Producto agregado correctamente", "success")
         return redirect(url_for("catalogo"))
     return render_template("nuevo.html")
 
@@ -65,6 +68,7 @@ def editar_producto(producto_id):
         )
         conn.commit()
         conn.close()
+        flash("Producto actualizado correctamente", "success")
         return redirect(url_for("detalle", producto_id=producto_id))
     conn.close()
     return render_template("editar.html", producto=producto)
@@ -82,4 +86,5 @@ def eliminar_producto(producto_id):
     conn.execute("DELETE FROM productos WHERE id = ?", (producto_id,))
     conn.commit()
     conn.close()
+    flash("Producto eliminado correctamente", "success")
     return redirect(url_for("catalogo"))
