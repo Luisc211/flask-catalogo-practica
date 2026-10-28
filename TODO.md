@@ -1,6 +1,5 @@
 
 ## Pendiente
-- [ ] Mensajes flash de confirmación
 - [ ] Validación de datos del formulario
 - [ ] Página de inicio con plantilla (`inicio.html`)
 - [ ] Página 404 personalizada
@@ -18,3 +17,4 @@
 - [x] Formulario para agregar productos
 - [x] Editar productos
 - [x] Eliminar productos
+- [x] Mensajes flash de confirmación
