@@ -1,0 +1,27 @@
+{% extends "base.html" %} {% block titulo %}Inicio{% endblock %} {% block
+contenido %}
+<section class="hero">
+  <h1>Bienvenido al catálogo</h1>
+  <p>Consulta, agrega y administra tus productos en un solo lugar.</p>
+  <p class="hero-total">Productos registrados: <strong>{{ total }}</strong></p>
+  <a class="btn" href="{{ url_for('catalogo') }}">Ver catálogo completo</a>
+</section>
+
+<h2>Últimos productos</h2>
+{% if recientes %}
+<ul>
+  {% for producto in recientes %}
+  <li>
+    <a href="{{ url_for('detalle', producto_id=producto.id) }}">
+      {{ producto.nombre }}
+    </a>
+    - ${{ producto.precio }}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>
+  Aún no hay productos.
+  <a href="{{ url_for('nuevo_producto') }}">Agrega el primero</a>.
+</p>
+{% endif %} {% endblock %}

@@ -42,7 +42,13 @@ def validar_producto(conn, nombre, precio_texto, producto_id=None):
 
 @app.route("/")
 def inicio():
-    return "¡Hola, Flask!"
+    conn = get_connection()
+    total = conn.execute("SELECT COUNT(*) FROM productos").fetchone()[0]
+    recientes = conn.execute(
+        "SELECT * FROM productos ORDER BY id DESC LIMIT 3"
+    ).fetchall()
+    conn.close()
+    return render_template("inicio.html", total=total, recientes=recientes)
 
 
 @app.route("/catalogo")
