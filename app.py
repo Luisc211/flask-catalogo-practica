@@ -7,6 +7,38 @@ app.secret_key = "key-secreta"
 
 init_db()
 
+def validar_producto(conn, nombre, precio_texto, producto_id=None):
+    """Devuelve (nombre, precio, errores). Si hay errores, no guardes nada."""
+    errores = []
+    nombre = nombre.strip()
+    precio = None
+    if not nombre:
+        errores.append("El nombre es obligatorio")
+    elif len(nombre) > 30:
+        errores.append("El nombre no puede superar los 30 caracteres")
+    else:
+        if producto_id is None:
+            repetido = conn.execute(
+                "SELECT id FROM productos WHERE LOWER(nombre) = LOWER(?)",
+                (nombre,),
+            ).fetchone()
+        else:
+            repetido = conn.execute(
+                "SELECT id FROM productos WHERE LOWER(nombre) = LOWER(?) AND id != ?",
+                (nombre, producto_id),
+            ).fetchone()
+        if repetido:
+            errores.append("Ya existe un producto con ese nombre")
+    try:
+        precio = int(precio_texto)
+    except ValueError:
+        errores.append("El precio debe ser un número entero")
+    else:
+        if precio <= 0:
+            errores.append("El precio debe ser mayor que cero")
+        elif precio > 100_000_000:
+            errores.append("El precio es demasiado alto")
+    return nombre, precio, errores
 
 @app.route("/")
 def inicio():
@@ -24,9 +56,18 @@ def catalogo():
 @app.route("/producto/nuevo", methods=["GET", "POST"])
 def nuevo_producto():
     if request.method == "POST":
-        nombre = request.form["nombre"].strip()
-        precio = int(request.form["precio"])
+        nombre_form = request.form.get("nombre", "")
+        precio_form = request.form.get("precio", "")
         conn = get_connection()
+        nombre, precio, errores = validar_producto(conn, nombre_form, precio_form)
+        if errores:
+            conn.close()
+            for error in errores:
+                flash(error, "error")
+            return (
+                render_template("nuevo.html", nombre=nombre_form, precio=precio_form),
+                400,
+            )
         conn.execute(
             "INSERT INTO productos (nombre, precio) VALUES (?, ?)",
             (nombre, precio),
@@ -35,7 +76,7 @@ def nuevo_producto():
         conn.close()
         flash("Producto agregado correctamente", "success")
         return redirect(url_for("catalogo"))
-    return render_template("nuevo.html")
+    return render_template("nuevo.html", nombre="", precio="")
 
 
 @app.route("/producto/<int:producto_id>")
@@ -59,9 +100,29 @@ def editar_producto(producto_id):
     if producto is None:
         conn.close()
         abort(404)
+
     if request.method == "POST":
-        nombre = request.form["nombre"].strip()
-        precio = int(request.form["precio"])
+        nombre_form = request.form.get("nombre", "")
+        precio_form = request.form.get("precio", "")
+
+        nombre, precio, errores = validar_producto(
+            conn, nombre_form, precio_form, producto_id
+        )
+
+        if errores:
+            conn.close()
+            for error in errores:
+                flash(error, "error")
+            return (
+                render_template(
+                    "editar.html",
+                    producto=producto,
+                    nombre=nombre_form,
+                    precio=precio_form,
+                ),
+                400,
+            )
+
         conn.execute(
             "UPDATE productos SET nombre = ?, precio = ? WHERE id = ?",
             (nombre, precio, producto_id),
@@ -70,8 +131,14 @@ def editar_producto(producto_id):
         conn.close()
         flash("Producto actualizado correctamente", "success")
         return redirect(url_for("detalle", producto_id=producto_id))
+
     conn.close()
-    return render_template("editar.html", producto=producto)
+    return render_template(
+        "editar.html",
+        producto=producto,
+        nombre=producto["nombre"],
+        precio=producto["precio"],
+    )
 
 
 @app.route("/producto/<int:producto_id>/eliminar", methods=["POST"])

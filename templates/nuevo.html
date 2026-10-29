@@ -4,9 +4,22 @@ block contenido %}
 
 <form method="POST">
   <label for="nombre">Nombre</label>
-  <input type="text" id="nombre" name="nombre" required />
+  <input
+    type="text"
+    id="nombre"
+    name="nombre"
+    value="{{ nombre }}"
+    required
+  />
   <label for="precio">Precio</label>
-  <input type="number" id="precio" name="precio" min="1" required />
+  <input
+    type="number"
+    id="precio"
+    name="precio"
+    min="1"
+    value="{{ precio }}"
+    required
+  />
   <button type="submit">Guardar</button>
 </form>
 

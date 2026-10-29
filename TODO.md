@@ -1,6 +1,6 @@
 
 ## Pendiente
-- [ ] Validación de datos del formulario
+- [ ] El formulario acepta precios desde 1, corregir para mostrar precios validos y realistas
 - [ ] Página de inicio con plantilla (`inicio.html`)
 - [ ] Página 404 personalizada
 - [ ] Subir proyecto a GitHub con README
@@ -18,3 +18,4 @@
 - [x] Editar productos
 - [x] Eliminar productos
 - [x] Mensajes flash de confirmación
+- [x] Validación de datos del formulario
