@@ -156,3 +156,7 @@ button:hover {
 .btn:hover {
   opacity: 0.9;
 }
+
+.hero .btn {
+  margin: 0.25rem;
+}

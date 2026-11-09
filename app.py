@@ -161,3 +161,7 @@ def eliminar_producto(producto_id):
     conn.close()
     flash("Producto eliminado correctamente", "success")
     return redirect(url_for("catalogo"))
+
+@app.errorhandler(404)
+def pagina_no_encontrada(error):
+    return render_template("404.html"), 404
