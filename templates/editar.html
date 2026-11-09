@@ -3,19 +3,14 @@ endblock %} {% block contenido %}
 <h1>Editar producto</h1>
 <form method="POST">
   <label for="nombre">Nombre</label>
-  <input
-    type="text"
-    id="nombre"
-    name="nombre"
-    value="{{ nombre }}"
-    required
-  />
+  <input type="text" id="nombre" name="nombre" value="{{ nombre }}" required />
   <label for="precio">Precio</label>
   <input
     type="number"
     id="precio"
     name="precio"
-    min="1"
+    min="{{ precio_min }}"
+    step="100"
     value="{{ precio }}"
     required
   />

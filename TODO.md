@@ -1,6 +1,5 @@
 
 ## Pendiente
-- [ ] El formulario acepta precios desde 1, corregir para mostrar precios validos y realistas
 - [ ] Subir proyecto a GitHub con README
 
 ## Hecho
@@ -19,3 +18,4 @@
 - [x] Validación de datos del formulario
 - [x] Página de inicio con plantilla (`inicio.html`)
 - [x] Página 404 personalizada
+- [X] El formulario acepta precios desde 1, corregir para mostrar precios validos y realistas

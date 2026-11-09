@@ -7,6 +7,13 @@ app.secret_key = "key-secreta"
 
 init_db()
 
+PRECIO_MIN = 1000
+PRECIO_MAX = 100_000_000
+
+@app.context_processor
+def inyectar_constantes():
+    return {"precio_min": PRECIO_MIN}
+
 def validar_producto(conn, nombre, precio_texto, producto_id=None):
     """Devuelve (nombre, precio, errores). Si hay errores, no guardes nada."""
     errores = []
@@ -36,7 +43,9 @@ def validar_producto(conn, nombre, precio_texto, producto_id=None):
     else:
         if precio <= 0:
             errores.append("El precio debe ser mayor que cero")
-        elif precio > 100_000_000:
+        elif precio < PRECIO_MIN:
+            errores.append(f"El precio mínimo es ${PRECIO_MIN:,}".replace(",", "."))
+        elif precio > PRECIO_MAX:
             errores.append("El precio es demasiado alto")
     return nombre, precio, errores
 
