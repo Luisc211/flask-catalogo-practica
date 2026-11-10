@@ -7,22 +7,29 @@ app.secret_key = "key-secreta"
 
 init_db()
 
-PRECIO_MIN = 1000
-PRECIO_MAX = 100_000_000
+def formatear_precio(valor):
+    return f"{valor:,}".replace(",", ".")
 
-@app.context_processor
-def inyectar_constantes():
-    return {"precio_min": PRECIO_MIN}
 
-def validar_producto(conn, nombre, precio_texto, producto_id=None):
-    """Devuelve (nombre, precio, errores). Si hay errores, no guardes nada."""
+app.add_template_filter(formatear_precio, "precio")
+
+
+def obtener_categorias(conn):
+    return conn.execute("SELECT * FROM categorias ORDER BY nombre").fetchall()
+
+
+def validar_producto(conn, nombre, precio_texto, categoria_texto, producto_id=None):
+    """Devuelve (nombre, precio, categoria_id, errores). Si hay errores, no guardes nada."""
     errores = []
     nombre = nombre.strip()
     precio = None
+    categoria = None
+
+    # Nombre
     if not nombre:
         errores.append("El nombre es obligatorio")
-    elif len(nombre) > 30:
-        errores.append("El nombre no puede superar los 30 caracteres")
+    elif len(nombre) > 100:
+        errores.append("El nombre no puede superar los 100 caracteres")
     else:
         if producto_id is None:
             repetido = conn.execute(
@@ -36,18 +43,40 @@ def validar_producto(conn, nombre, precio_texto, producto_id=None):
             ).fetchone()
         if repetido:
             errores.append("Ya existe un producto con ese nombre")
+
+    # Categoría
+    try:
+        categoria = conn.execute(
+            "SELECT * FROM categorias WHERE id = ?", (int(categoria_texto),)
+        ).fetchone()
+    except ValueError:
+        categoria = None
+    if categoria is None:
+        errores.append("Selecciona una categoría válida")
+
+    # Precio
     try:
         precio = int(precio_texto)
     except ValueError:
         errores.append("El precio debe ser un número entero")
     else:
-        if precio <= 0:
+        if categoria is not None:
+            if precio < categoria["precio_min"]:
+                errores.append(
+                    f"En {categoria['nombre']} el precio mínimo es "
+                    f"${formatear_precio(categoria['precio_min'])}"
+                )
+            elif precio > categoria["precio_max"]:
+                errores.append(
+                    f"En {categoria['nombre']} el precio máximo es "
+                    f"${formatear_precio(categoria['precio_max'])}"
+                )
+        elif precio <= 0:
             errores.append("El precio debe ser mayor que cero")
-        elif precio < PRECIO_MIN:
-            errores.append(f"El precio mínimo es ${PRECIO_MIN:,}".replace(",", "."))
-        elif precio > PRECIO_MAX:
-            errores.append("El precio es demasiado alto")
-    return nombre, precio, errores
+
+    categoria_id = categoria["id"] if categoria else None
+    return nombre, precio, categoria_id, errores
+
 
 @app.route("/")
 def inicio():
@@ -63,42 +92,73 @@ def inicio():
 @app.route("/catalogo")
 def catalogo():
     conn = get_connection()
-    productos = conn.execute("SELECT * FROM productos").fetchall()
+    productos = conn.execute(
+        """
+        SELECT p.*, c.nombre AS categoria
+        FROM productos p
+        JOIN categorias c ON c.id = p.categoria_id
+        ORDER BY p.id
+        """
+    ).fetchall()
     conn.close()
     return render_template("catalogo.html", productos=productos)
 
 
 @app.route("/producto/nuevo", methods=["GET", "POST"])
 def nuevo_producto():
+    conn = get_connection()
+    categorias = obtener_categorias(conn)
+
     if request.method == "POST":
         nombre_form = request.form.get("nombre", "")
         precio_form = request.form.get("precio", "")
-        conn = get_connection()
-        nombre, precio, errores = validar_producto(conn, nombre_form, precio_form)
+        categoria_form = request.form.get("categoria_id", "")
+
+        nombre, precio, categoria_id, errores = validar_producto(
+            conn, nombre_form, precio_form, categoria_form
+        )
+
         if errores:
             conn.close()
             for error in errores:
                 flash(error, "error")
             return (
-                render_template("nuevo.html", nombre=nombre_form, precio=precio_form),
+                render_template(
+                    "nuevo.html",
+                    nombre=nombre_form,
+                    precio=precio_form,
+                    categoria_id=categoria_form,
+                    categorias=categorias,
+                ),
                 400,
             )
+
         conn.execute(
-            "INSERT INTO productos (nombre, precio) VALUES (?, ?)",
-            (nombre, precio),
+            "INSERT INTO productos (nombre, precio, categoria_id) VALUES (?, ?, ?)",
+            (nombre, precio, categoria_id),
         )
         conn.commit()
         conn.close()
         flash("Producto agregado correctamente", "success")
         return redirect(url_for("catalogo"))
-    return render_template("nuevo.html", nombre="", precio="")
+
+    conn.close()
+    return render_template(
+        "nuevo.html", nombre="", precio="", categoria_id="", categorias=categorias
+    )
 
 
 @app.route("/producto/<int:producto_id>")
 def detalle(producto_id):
     conn = get_connection()
     producto = conn.execute(
-        "SELECT * FROM productos WHERE id = ?", (producto_id,)
+        """
+        SELECT p.*, c.nombre AS categoria
+        FROM productos p
+        JOIN categorias c ON c.id = p.categoria_id
+        WHERE p.id = ?
+        """,
+        (producto_id,),
     ).fetchone()
     conn.close()
     if producto is None:
@@ -116,12 +176,15 @@ def editar_producto(producto_id):
         conn.close()
         abort(404)
 
+    categorias = obtener_categorias(conn)
+
     if request.method == "POST":
         nombre_form = request.form.get("nombre", "")
         precio_form = request.form.get("precio", "")
+        categoria_form = request.form.get("categoria_id", "")
 
-        nombre, precio, errores = validar_producto(
-            conn, nombre_form, precio_form, producto_id
+        nombre, precio, categoria_id, errores = validar_producto(
+            conn, nombre_form, precio_form, categoria_form, producto_id
         )
 
         if errores:
@@ -134,13 +197,15 @@ def editar_producto(producto_id):
                     producto=producto,
                     nombre=nombre_form,
                     precio=precio_form,
+                    categoria_id=categoria_form,
+                    categorias=categorias,
                 ),
                 400,
             )
 
         conn.execute(
-            "UPDATE productos SET nombre = ?, precio = ? WHERE id = ?",
-            (nombre, precio, producto_id),
+            "UPDATE productos SET nombre = ?, precio = ?, categoria_id = ? WHERE id = ?",
+            (nombre, precio, categoria_id, producto_id),
         )
         conn.commit()
         conn.close()
@@ -153,6 +218,8 @@ def editar_producto(producto_id):
         producto=producto,
         nombre=producto["nombre"],
         precio=producto["precio"],
+        categoria_id=producto["categoria_id"],
+        categorias=categorias,
     )
 
 

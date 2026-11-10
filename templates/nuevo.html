@@ -5,6 +5,16 @@ block contenido %}
 <form method="POST">
   <label for="nombre">Nombre</label>
   <input type="text" id="nombre" name="nombre" value="{{ nombre }}" required />
+  <label for="categoria_id">Categoría</label>
+  <select id="categoria_id" name="categoria_id" required>
+    <option value="">Selecciona una categoría</option>
+    {% for c in categorias %}
+      {% set marcada = "selected" if c.id|string == categoria_id|string else "" %}
+      <option value="{{ c.id }}" {{ marcada }}>
+        {{ c.nombre }} (${{ c.precio_min|precio }} – ${{ c.precio_max|precio }})
+      </option>
+    {% endfor %}
+  </select>
   <label for="precio">Precio</label>
   <input
     type="number"
